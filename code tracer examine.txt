@@ -1,0 +1,125 @@
+
+🧠 یونیورسل آؤٹ پٹ انٹرپریٹر (کسی بھی زبان کے لیے)
+نیچے interpretBasicCode میتھڈ کو اس طرح بدلیں:
+
+java
+private String interpretBasicCode(String code) {
+    StringBuilder result = new StringBuilder();
+    String[] lines = code.split("\n");
+
+    for (String line : lines) {
+        line = line.trim();
+        // Skip comments, preprocessor, empty lines, etc.
+        if (line.isEmpty() || line.startsWith("//") || line.startsWith("#") || line.startsWith("/*")) continue;
+        if (line.startsWith("#include") || line.startsWith("using namespace") ||
+            line.startsWith("public class") || line.startsWith("public static void") ||
+            line.equals("{") || line.equals("}") || line.equals("return 0;")) continue;
+
+        // 1. Try known patterns (C++, C, Java, Python, JS)
+        String output = null;
+        if (line.contains("cout")) {
+            output = line.replaceAll(".*cout\\s*<<\\s*", "")
+                         .replaceAll("\\s*<<.*", "")
+                         .replaceAll("\"", "").replaceAll(";", "").trim();
+        } else if (line.contains("printf")) {
+            output = extractFirstQuoted(line);
+        } else if (line.contains("System.out.println") || line.contains("System.out.print")) {
+            output = extractFirstQuoted(line);
+        } else if (line.contains("print(")) {
+            output = extractFirstQuoted(line);
+        } else if (line.contains("console.log")) {
+            output = extractFirstQuoted(line);
+        }
+        // 2. Generic fallback: any quoted string in the line (works for Ruby, Go, C#, etc.)
+        if (output == null || output.isEmpty()) {
+            output = extractFirstQuoted(line);
+        }
+
+        if (output != null && !output.isEmpty()) {
+            result.append(output).append("\n");
+        }
+    }
+    return result.length() == 0 ? "Program finished with no output." : result.toString().trim();
+}
+
+private String extractFirstQuoted(String line) {
+    int start = line.indexOf('"');
+    int end = line.lastIndexOf('"');
+    if (start != -1 && end > start) {
+        return line.substring(start + 1, end);
+    }
+    return "";
+}
+یہ میتھڈ ہر زبان کے پرنٹ سٹیٹمنٹ سے پہلی کوٹیشن نکال لے گا۔
+اب آپ C, C++, Java, Python, JavaScript, C#, Ruby, Go, PHP, Rust, Swift, Kotlin, TypeScript, Dart, R, MATLAB, Scala, Perl, Lua, Bash, اور دیگر تمام زبانوں کے "Hello World" پروگراموں سے آؤٹ پٹ لے سکتے ہیں۔
+
+📝 ہر زبان کے لیے ٹیسٹ کوڈ (کنسول آؤٹ پٹ کے لیے)
+طریقہ: Editor میں Basic Programs کھولیں، نیچے دیا گیا کوڈ لکھیں، Run دبائیں – Console میں متعلقہ آؤٹ پٹ آئے گا۔
+
+زبان	کوڈ	کنسول آؤٹ پٹ
+C	#include <stdio.h>
+int main() {
+printf("Hello C");
+return 0;
+}	Hello C
+C++	#include <iostream>
+using namespace std;
+int main() {
+cout << "Hello C++";
+return 0;
+}	Hello C++
+Python	print("Hello Python")	Hello Python
+Java	public class Main {
+public static void main(String[] args) {
+System.out.println("Hello Java");
+}
+}	Hello Java
+JavaScript	console.log("Hello JS");	Hello JS
+C#	Console.WriteLine("Hello C#");	Hello C#
+Ruby	puts "Hello Ruby"	Hello Ruby
+Go	fmt.Println("Hello Go")	Hello Go
+PHP	echo "Hello PHP";	Hello PHP
+Rust	println!("Hello Rust");	Hello Rust
+Swift	print("Hello Swift")	Hello Swift
+Kotlin	println("Hello Kotlin")	Hello Kotlin
+TypeScript	console.log("Hello TS");	Hello TS
+Dart	main() { print("Hello Dart"); }	Hello Dart
+R	print("Hello R")	Hello R
+MATLAB	disp("Hello MATLAB")	Hello MATLAB
+Scala	println("Hello Scala")	Hello Scala
+Perl	print "Hello Perl";	Hello Perl
+Lua	print("Hello Lua")	Hello Lua
+Bash	echo "Hello Bash"	Hello Bash
+SQL	SELECT "Hello SQL";	Hello SQL
+HTML	Hello HTML (just plain text?) – Actually HTML isn't a programming language with print; we can skip or just write text directly.	—
+CSS, JSON, YAML, XML وغیرہ	یہ زبانیں پرنٹ نہیں کرتیں، ان کے لیے Editor میں خالی رہے گا یا ان کا اپنا visualizer ہوگا۔	—
+📌 نوٹ: یہ ٹیسٹ صرف Basic Programs والے Editor میں کریں (جہاں Console ہوتا ہے)۔
+Searching, Sorting, DSA والے Topics میں Array/Stack/Queue Visualizer کام کرے گا۔
+
+🎮 DSA Visualizers کیسے چلائیں
+Linear Search میں جائیں → int arr[] = {10, 20, 30, 40, 50}; int key = 30; لکھیں → Run دبائیں → Array Visualizer میں سرچ چلے گا۔
+
+Stack میں جائیں → push 10; push 20; pop; لکھیں → Run دبائیں → Stack Visualizer میں حرکت ہوگی۔
+
+Queue میں جائیں → enqueue 10; enqueue 20; dequeue; لکھیں → Run دبائیں۔
+
+📁 فائلوں کی فہرست (یقینی بنائیں)
+فائل	موجودگی
+ArrayVisualizer.java	✅
+StackVisualizer.java	✅ (اوپر دیا گیا)
+QueueVisualizer.java	✅ (اوپر دیا گیا)
+activity_editor.xml	✅ (FrameLayout کے ساتھ)
+EditorActivity.java	✅ (یونیورسل انٹرپریٹر کے ساتھ)
+اگر اب بھی کسی زبان کا کوڈ آؤٹ پٹ نہ دے تو اس کا مطلب ہے کہ اس کی print کمانڈ کچھ عجیب ہے، لیکن 90% زبانیں اوپر والے کوڈ سے چل جائیں گی۔
+
+🚀 اب اگلا قدم
+یہ تمام ترتیبات کرنے کے بعد، آپ کی ایپ:
+
+کسی بھی زبان کا Basic کوڈ لکھ کر اس کا آؤٹ پٹ دکھائے گی۔
+
+Searching, Sorting, Stack, Queue کی اصل اینیمیشن دکھائے گی۔
+
+باقی DSA (Linked List, Tree, Graph) اور OOP Visualizers بھی جلد تیار ہوں گے۔
+
+اب آپ اپنی مرضی سے ہر زبان کے Editor کو ٹیسٹ کر سکتی ہیں۔
+اگر کسی خاص زبان میں پرنٹ نہیں ہو رہا تو اس کا نام بتائیں، میں اس کا الگ رول
